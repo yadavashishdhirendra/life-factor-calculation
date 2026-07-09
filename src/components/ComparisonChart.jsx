@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
+  BarController,
   BarElement,
   CategoryScale,
   Chart as ChartJS,
   Filler,
   Legend,
   LinearScale,
+  LineController,
   LineElement,
   PointElement,
   Tooltip,
@@ -13,7 +15,18 @@ import {
 import { Chart } from "react-chartjs-2";
 import { formatValue } from "../utils/format";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Filler, Tooltip, Legend);
+ChartJS.register(
+  BarController,
+  LineController,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Filler,
+  Tooltip,
+  Legend
+);
 
 function getCssVar(name, fallback) {
   if (typeof window === "undefined") return fallback;
