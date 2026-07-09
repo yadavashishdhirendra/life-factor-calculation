@@ -1,48 +1,52 @@
 # Parental Legacy & Life Factors Calculator
 
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=111827)
+![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=ffffff)
+![Chart.js](https://img.shields.io/badge/Chart.js-4-FF6384?logo=chartdotjs&logoColor=ffffff)
+![Lucide](https://img.shields.io/badge/Lucide-Icons-0F766E)
+![LocalStorage](https://img.shields.io/badge/Persistence-localStorage-334155)
+
 A modern React assessment project that calculates Mother and Father life-factor values from a user's date of birth, visualizes the comparison, and supports local saving plus CSV/PDF exports.
 
 ## Overview
 
 The calculator uses the selected day of the month to determine parental weighting:
 
-- Odd days favor Mother values.
-- Even days favor Father values.
-- Every factor displays Mother, Father, and combined Total values.
-- Mother Total + Father Total is always exactly `100.000`.
+| Rule | Behavior |
+| --- | --- |
+| Mother weighting | Odd days favor Mother values. |
+| Father weighting | Even days favor Father values. |
+| Factor totals | Every factor displays Mother, Father, and combined Total values. |
+| Grand total | Mother Total + Father Total is always exactly `100.000`. |
 
 The app is implemented as a frontend-only full-stack-style solution using `localStorage` for persistence.
 
 ## Features
 
-- Date of birth picker using `react-datepicker`
-- Invalid and future-date validation
-- Automatic calculation on DOB selection
-- Seven required life factors with configured min/max ranges
-- Mother Total, Father Total, and Grand Total display
-- Higher parental legacy indicator
-- Responsive table and mobile-friendly chart layout
-- Chart.js stacked bar and line visual comparison
-- Lazy-loaded result sections with loaders
-- Top-center animated toast messages with status icons for user actions
-- Loading states while files are generated
-- Export results as CSV
-- Export results as PDF
-- Save recent results in `localStorage`
-- Dark/light mode toggle
-- Global Montserrat typography
+| Area | Details |
+| --- | --- |
+| Input | Date of birth picker using `react-datepicker`, with invalid and future-date validation. |
+| Calculation | Automatic calculation on DOB selection across seven required life factors. |
+| Results | Mother Total, Father Total, Grand Total, and higher parental legacy indicator. |
+| Visualization | Responsive table plus Chart.js stacked bar and line comparison. |
+| Feedback | Top-center animated toast messages with Lucide status icons. |
+| Export | Loading states while generating CSV and PDF files. |
+| Persistence | Save recent results in browser `localStorage`. |
+| Theme | Dark/light mode toggle with global Montserrat typography. |
 
 ## Tech Stack
 
-- React.js
-- Vite
-- Chart.js
-- React Chart.js 2
-- React Datepicker
-- jsPDF
-- Lucide React
-- CSS3
-- localStorage
+| Technology | Purpose |
+| --- | --- |
+| React.js | Frontend UI |
+| Vite | Development server and production bundling |
+| Chart.js | Result visualization |
+| React Chart.js 2 | React wrapper for Chart.js |
+| React Datepicker | DOB selection |
+| jsPDF | PDF export |
+| Lucide React | Interface and toast icons |
+| CSS3 | Responsive styling, themes, and animations |
+| localStorage | Browser-based saved results |
 
 ## Project Structure
 
