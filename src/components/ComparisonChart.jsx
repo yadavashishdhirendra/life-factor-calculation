@@ -1,69 +1,173 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Filler,
   Legend,
-  ResponsiveContainer,
+  LinearScale,
+  LineElement,
+  PointElement,
   Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+} from "chart.js";
+import { Chart } from "react-chartjs-2";
 import { formatValue } from "../utils/format";
 
+ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Filler, Tooltip, Legend);
+
+function getCssVar(name, fallback) {
+  if (typeof window === "undefined") return fallback;
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+}
+
 function ComparisonChart({ result }) {
-  const [isMobile, setIsMobile] = useState(() =>
-    typeof window !== "undefined" ? window.matchMedia("(max-width: 760px)").matches : false
+  const [themeKey, setThemeKey] = useState(() =>
+    typeof document !== "undefined" ? document.documentElement.dataset.theme || "light" : "light"
   );
 
   useEffect(() => {
-    if (typeof window === "undefined") return undefined;
+    if (typeof document === "undefined") return undefined;
 
-    const mediaQuery = window.matchMedia("(max-width: 760px)");
-    const handleChange = (event) => setIsMobile(event.matches);
-    mediaQuery.addEventListener("change", handleChange);
+    const observer = new MutationObserver(() => {
+      setThemeKey(document.documentElement.dataset.theme || "light");
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
-    return () => mediaQuery.removeEventListener("change", handleChange);
+    return () => observer.disconnect();
   }, []);
 
-  const chartData = result.rows.map((row) => ({
-    factor: isMobile ? row.name : row.name.replace(" ", "\n"),
-    Mother: row.mother,
-    Father: row.father,
-  }));
+  const chartData = useMemo(
+    () => ({
+      labels: result.rows.map((row) => row.name),
+      datasets: [
+        {
+          type: "bar",
+          label: "Mother",
+          data: result.rows.map((row) => row.mother),
+          backgroundColor: getCssVar("--mother", "#d9577a"),
+          borderColor: getCssVar("--mother", "#d9577a"),
+          borderWidth: 0,
+          borderRadius: 5,
+          stack: "parental",
+          order: 2,
+        },
+        {
+          type: "bar",
+          label: "Father",
+          data: result.rows.map((row) => row.father),
+          backgroundColor: getCssVar("--father", "#1d8293"),
+          borderColor: getCssVar("--father", "#1d8293"),
+          borderWidth: 0,
+          borderRadius: 5,
+          stack: "parental",
+          order: 2,
+        },
+        {
+          type: "line",
+          label: "Total",
+          data: result.rows.map((row) => row.total),
+          borderColor: getCssVar("--accent-strong", "#163d46"),
+          backgroundColor: getCssVar("--accent-strong", "#163d46"),
+          borderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          tension: 0.35,
+          fill: false,
+          order: 1,
+        },
+      ],
+    }),
+    [result.rows, themeKey]
+  );
+
+  const chartOptions = useMemo(() => {
+    const textColor = getCssVar("--text", "#141f24");
+    const mutedColor = getCssVar("--muted", "#66757d");
+    const lineColor = getCssVar("--line", "#d7e2e6");
+
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: "index",
+        intersect: false,
+      },
+      plugins: {
+        legend: {
+          position: "top",
+          align: "end",
+          labels: {
+            color: textColor,
+            boxWidth: 10,
+            boxHeight: 10,
+            borderRadius: 5,
+            useBorderRadius: true,
+            font: {
+              family: "Montserrat",
+              size: 11,
+              weight: "600",
+            },
+          },
+        },
+        tooltip: {
+          backgroundColor: themeKey === "dark" ? "#151f22" : "#ffffff",
+          titleColor: textColor,
+          bodyColor: textColor,
+          borderColor: lineColor,
+          borderWidth: 1,
+          padding: 10,
+          callbacks: {
+            label: (context) => `${context.dataset.label}: ${formatValue(context.parsed.y)}`,
+          },
+        },
+      },
+      scales: {
+        x: {
+          stacked: true,
+          grid: {
+            display: false,
+          },
+          ticks: {
+            color: mutedColor,
+            maxRotation: 35,
+            minRotation: 0,
+            font: {
+              family: "Montserrat",
+              size: 10,
+              weight: "500",
+            },
+          },
+        },
+        y: {
+          stacked: true,
+          suggestedMax: 22,
+          grid: {
+            color: lineColor,
+            borderDash: [4, 5],
+          },
+          ticks: {
+            color: mutedColor,
+            font: {
+              family: "Montserrat",
+              size: 10,
+              weight: "500",
+            },
+          },
+        },
+      },
+    };
+  }, [themeKey]);
 
   return (
     <section className="chart-panel">
       <div className="section-heading">
         <p className="section-kicker">Charts</p>
-        <h2>Mother vs Father</h2>
-        <p>Visual comparison of parental values across all seven life factors.</p>
+        <h2>Stacked Parent Values</h2>
+        <p>Mother and Father values are stacked, with a line showing each factor total.</p>
       </div>
-      <div className={`chart-wrap ${isMobile ? "mobile-chart" : ""}`}>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={chartData}
-            layout={isMobile ? "vertical" : "horizontal"}
-            margin={isMobile ? { top: 8, right: 8, bottom: 8, left: 12 } : { top: 10, right: 10, bottom: 15, left: 0 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" vertical={!isMobile} horizontal={isMobile} />
-            {isMobile ? (
-              <>
-                <XAxis type="number" domain={[0, 12]} tick={{ fontSize: 11 }} />
-                <YAxis type="category" dataKey="factor" width={116} tick={{ fontSize: 10 }} />
-              </>
-            ) : (
-              <>
-                <XAxis dataKey="factor" tick={{ fontSize: 11 }} interval={0} />
-                <YAxis domain={[0, 12]} tick={{ fontSize: 11 }} />
-              </>
-            )}
-            <Tooltip formatter={(value) => formatValue(Number(value))} />
-            <Legend />
-            <Bar dataKey="Mother" fill="var(--mother)" radius={isMobile ? [0, 4, 4, 0] : [4, 4, 0, 0]} />
-            <Bar dataKey="Father" fill="var(--father)" radius={isMobile ? [0, 4, 4, 0] : [4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+
+      <div className="chart-wrap chartjs-wrap" role="img" aria-label="Stacked Mother and Father bar chart with Total line">
+        <Chart type="bar" data={chartData} options={chartOptions} />
       </div>
     </section>
   );

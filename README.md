@@ -22,9 +22,9 @@ The app is implemented as a frontend-only full-stack-style solution using `local
 - Mother Total, Father Total, and Grand Total display
 - Higher parental legacy indicator
 - Responsive table and mobile-friendly chart layout
-- Recharts visual comparison
+- Chart.js stacked bar and line visual comparison
 - Lazy-loaded result sections with loaders
-- Toast messages for user actions
+- Top-center animated toast messages with status icons for user actions
 - Loading states while files are generated
 - Export results as CSV
 - Export results as PDF
@@ -36,7 +36,8 @@ The app is implemented as a frontend-only full-stack-style solution using `local
 
 - React.js
 - Vite
-- Recharts
+- Chart.js
+- React Chart.js 2
 - React Datepicker
 - jsPDF
 - Lucide React
@@ -127,3 +128,4 @@ Each parent value remains within the factor range, and the final Grand Total rem
 - Backend and database are optional for this assessment, so persistence is handled with browser `localStorage`.
 - PDF export is lazy-loaded so the initial app remains lighter.
 - Chart and result sections are lazy-loaded with React `Suspense`.
+- Toast notifications use Lucide status icons and restart their entrance animation for each new message.
